@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  SignInViewController.swift
 //  Snapchat
 //
 //  Created by Enrique V. Kortright on 5/3/17.
@@ -7,19 +7,38 @@
 //
 
 import UIKit
+import Firebase
+import FirebaseAuth
 
 class ViewController: UIViewController {
-
+    
+    @IBOutlet weak var emailTextField: UITextField!
+    
+    @IBOutlet weak var passwordTextField: UITextField!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    @IBAction func signInTapped(_ sender: Any) {
+        print("signInTapped")
+        FIRAuth.auth()?.signIn(withEmail: emailTextField.text!, password: passwordTextField.text!, completion: { (user, error) in
+            if (error != nil) {
+                print("Error signing in: \(error!)... attempting to create user...")
+                FIRAuth.auth()?.createUser(withEmail: self.emailTextField.text!, password: self.passwordTextField.text!, completion: { (user, error) in
+                    if (error != nil) {
+                        print("Error creating user: \(error!).")
+                    } else {
+                        print("Created user: \(user!)")
+                        self.performSegue(withIdentifier: "signInSegue", sender: nil)
+                    }
+                })
+            } else {
+                print("Signed in: \(user!)")
+                self.performSegue(withIdentifier: "signInSegue", sender: nil)
+            }
+        })
     }
-
-
+    
 }
-
